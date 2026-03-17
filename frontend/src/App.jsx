@@ -154,7 +154,145 @@ function Nav({ activeSection, setActiveSection, mobileOpen, setMobileOpen }) {
     </nav>
   );
 }
+function ProductHero() {
+  const heroImages = ["/images/look1.jpg", "/images/look2.jpg", "/images/look3.jpg"];
+  const [currentIndex, setCurrentIndex] = useState(0);
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % heroImages.length);
+    }, 3000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 420,
+          aspectRatio: "3/4",
+          borderRadius: "50% 50% 45% 45% / 40% 40% 60% 60%",
+          overflow: "hidden",
+          boxShadow: `0 24px 80px rgba(219,161,162,0.35)`,
+          background: `linear-gradient(135deg, ${COLORS.blush} 0%, ${COLORS.rose} 50%, ${COLORS.champagne} 100%)`,
+          position: "relative",
+        }}
+      >
+        {heroImages.map((img, index) => (
+          <img
+            key={img}
+            src={img}
+            alt={`MOH product ${index + 1}`}
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              opacity: currentIndex === index ? 1 : 0,
+              transition: "opacity 0.9s ease-in-out",
+            }}
+          />
+        ))}
+
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(to top, rgba(66,43,35,0.28), rgba(66,43,35,0.05))",
+          }}
+        />
+
+        <div
+          style={{
+            position: "absolute",
+            bottom: 34,
+            left: 0,
+            right: 0,
+            textAlign: "center",
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontSize: 28,
+              fontWeight: 700,
+              color: COLORS.white,
+              letterSpacing: "0.1em",
+            }}
+          >
+            MOH
+          </div>
+          <div
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: 13,
+              color: "rgba(255,255,255,0.9)",
+              letterSpacing: "0.2em",
+            }}
+          >
+            BY AMIKSHA
+          </div>
+        </div>
+      </div>
+
+      {[
+        { top: "8%", right: "-5%", size: 80, color: COLORS.blush },
+        { bottom: "15%", left: "-8%", size: 60, color: COLORS.champagne },
+        { top: "45%", right: "-10%", size: 50, color: COLORS.rose },
+      ].map((s, i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            ...s,
+            width: s.size,
+            height: s.size,
+            borderRadius: "50%",
+            background: s.color,
+            opacity: 0.6,
+          }}
+        />
+      ))}
+
+      <div
+        style={{
+          position: "absolute",
+          bottom: -28,
+          display: "flex",
+          gap: 8,
+          justifyContent: "center",
+          width: "100%",
+        }}
+      >
+        {heroImages.map((_, index) => (
+          <span
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            style={{
+              width: currentIndex === index ? 22 : 10,
+              height: 10,
+              borderRadius: 999,
+              background: currentIndex === index ? COLORS.deepRose : COLORS.blush,
+              transition: "all 0.25s ease",
+              cursor: "pointer",
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 function HeroSection({ setActiveSection }) {
   return (
     <section style={{ minHeight: "100vh", display: "flex", alignItems: "center", position: "relative", paddingTop: 72 }}>
@@ -206,29 +344,9 @@ function HeroSection({ setActiveSection }) {
           </div>
         </div>
 
-        <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center" }}>
-          <div style={{
-            width: "100%", maxWidth: 420, aspectRatio: "3/4", borderRadius: "50% 50% 45% 45% / 40% 40% 60% 60%",
-            background: `linear-gradient(135deg, ${COLORS.blush} 0%, ${COLORS.rose} 50%, ${COLORS.champagne} 100%)`,
-            display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
-            boxShadow: `0 24px 80px rgba(219,161,162,0.35)`,
-          }}>
-            <svg width="80%" height="80%" viewBox="0 0 300 400" opacity="0.15">
-              <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" style={{fontFamily:"'Playfair Display',serif",fontSize:200,fontWeight:700,fill:COLORS.white}}>M</text>
-            </svg>
-            <div style={{position:"absolute",bottom:40,textAlign:"center"}}>
-              <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:28,fontWeight:700,color:COLORS.white,letterSpacing:"0.1em"}}>MOH</div>
-              <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:13,color:"rgba(255,255,255,0.85)",letterSpacing:"0.2em"}}>BY AMIKSHA</div>
-            </div>
-          </div>
-
-          {[{top:"8%",right:"-5%",size:80,color:COLORS.blush},{bottom:"15%",left:"-8%",size:60,color:COLORS.champagne},{top:"45%",right:"-10%",size:50,color:COLORS.rose}].map((s,i)=>(
-            <div key={i} style={{
-              position:"absolute", ...s, width:s.size, height:s.size,
-              borderRadius:"50%", background:s.color, opacity:0.6,
-            }}/>
-          ))}
-        </div>
+<div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center" }}>
+  <ProductHero />
+</div>
       </div>
     </section>
   );
