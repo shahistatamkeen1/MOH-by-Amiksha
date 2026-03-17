@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-const WHATSAPP_NUMBER = "919999999999"; // Replace with actual number
+const WHATSAPP_NUMBER = "919912021000"; // Replace with actual number
 
 const COLORS = {
   cream: "#F9F6F1",
@@ -50,6 +50,10 @@ const products = [
     customizable: true,
   },
 ];
+function openWhatsApp(message) {
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  window.open(url, "_blank");
+}
 
 const flowerSVG = (x, y, size, color, opacity = 0.6) => `
   <g transform="translate(${x},${y})" opacity="${opacity}">
@@ -425,10 +429,19 @@ function ShopSection() {
     : filter === "new_arrivals" ? products.filter(p=>p.category==="new_arrivals")
     : products.filter(p=>p.category==="collections");
 
-  const handleWhatsapp = (p) => {
-    const msg = encodeURIComponent(`Hi! I'm interested in the *${p.name}* (₹${p.price.toLocaleString()}) from the ${p.collection} collection. Could you please share more details?`);
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
-  };
+const SITE_URL = "http://localhost:5173"; // replace later with your real live website URL
+
+const handleWhatsapp = (p) => {
+  openWhatsApp(
+    `Hi! I'm interested in:
+
+Product: ${p.name}
+Price: ₹${p.price.toLocaleString()}
+Image: ${SITE_URL}${p.image}
+
+Please share more details.`
+  );
+};
 
   return (
     <section style={{ padding: "100px 0 80px", position:"relative", zIndex:1 }}>
@@ -496,12 +509,31 @@ function CollectionsSection() {
               <div style={{ fontFamily:"'Cormorant Garamond',serif",fontSize:13,color:COLORS.tobago,letterSpacing:"0.15em",opacity:0.7,marginBottom:8 }}>{col.count} PIECES</div>
               <h3 style={{ fontFamily:"'Playfair Display',serif",fontSize:32,fontWeight:700,color:COLORS.tobago,marginBottom:12 }}>{col.name}</h3>
               <p style={{ fontFamily:"'Cormorant Garamond',serif",fontSize:16,color:COLORS.tobago,opacity:0.8,lineHeight:1.6,marginBottom:24 }}>{col.desc}</p>
-              <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hi! I'd love to know more about the ${col.name} collection.`)}`} target="_blank" rel="noreferrer" style={{
-                display:"inline-flex",alignItems:"center",gap:8,
-                background:COLORS.tobago,color:COLORS.cream,
-                borderRadius:40,padding:"10px 24px",textDecoration:"none",
-                fontFamily:"'Cormorant Garamond',serif",fontSize:14,fontWeight:600,width:"fit-content"
-              }}>Enquire on WhatsApp</a>
+              <button
+  onClick={() =>
+    openWhatsApp(
+      `Hi! I'd love to know more about the ${col.name} collection. Please share available designs and details.`
+    )
+  }
+  style={{
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    background: COLORS.tobago,
+    color: COLORS.cream,
+    borderRadius: 40,
+    padding: "10px 24px",
+    textDecoration: "none",
+    fontFamily: "'Cormorant Garamond',serif",
+    fontSize: 14,
+    fontWeight: 600,
+    width: "fit-content",
+    border: "none",
+    cursor: "pointer",
+  }}
+>
+  Enquire on WhatsApp
+</button>
             </div>
           ))}
         </div>
