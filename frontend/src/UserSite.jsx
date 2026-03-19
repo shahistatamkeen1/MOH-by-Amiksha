@@ -573,6 +573,7 @@ function HeroSection({ setActiveSection, products }) {
             Handcrafted women's fashion from the heart of India. Each piece is a
             canvas of femininity — made to order, made for you.
           </p>
+          
 
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
             <button
@@ -873,6 +874,7 @@ Please share more details.`
             designed for elegance, comfort, and customization.
           </p>
         </div>
+        
 
         <div
           style={{
@@ -1326,52 +1328,62 @@ function AboutSection() {
             alignItems: "center",
           }}
         >
-          <div style={{ position: "relative" }}>
-            <div
-              style={{
-                width: "100%",
-                maxWidth: 420,
-                aspectRatio: "1",
-                borderRadius: "60% 40% 60% 40% / 40% 60% 40% 60%",
-                background: `linear-gradient(135deg, ${COLORS.champagne} 0%, ${COLORS.rose} 100%)`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                bottom: -20,
-                right: 0,
-                background: COLORS.white,
-                borderRadius: 20,
-                padding: "20px 28px",
-                border: `1px solid ${COLORS.blush}`,
-                boxShadow: `0 8px 30px rgba(219,161,162,0.15)`,
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: "'Playfair Display',serif",
-                  fontSize: 28,
-                  fontWeight: 700,
-                  color: COLORS.tobago,
-                }}
-              >
-                2020
-              </div>
-              <div
-                style={{
-                  fontFamily: "'Cormorant Garamond',serif",
-                  fontSize: 14,
-                  color: COLORS.mutedText,
-                }}
-              >
-                Founded with love
-              </div>
-            </div>
-          </div>
+          <div
+  style={{
+    position: "relative",
+    width: "100%",
+    maxWidth: 460,
+    aspectRatio: "4/5",
+    borderRadius: "28px 120px 28px 120px",
+    overflow: "hidden",
+    boxShadow: "0 18px 50px rgba(0,0,0,0.10)",
+    background: COLORS.blush,
+  }}
+>
+  <img
+    src="/images/about-founder.jpg"
+    alt="Founder"
+    style={{
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+      display: "block",
+    }}
+  />
+
+  <div
+    style={{
+      position: "absolute",
+      bottom: 20,
+      right: 20,
+      background: COLORS.white,
+      borderRadius: 20,
+      padding: "20px 28px",
+      border: `1px solid ${COLORS.blush}`,
+      boxShadow: `0 8px 30px rgba(219,161,162,0.15)`,
+    }}
+  >
+    <div
+      style={{
+        fontFamily: "'Playfair Display',serif",
+        fontSize: 28,
+        fontWeight: 700,
+        color: COLORS.tobago,
+      }}
+    >
+      2020
+    </div>
+    <div
+      style={{
+        fontFamily: "'Cormorant Garamond',serif",
+        fontSize: 14,
+        color: COLORS.mutedText,
+      }}
+    >
+      Founded with love
+    </div>
+  </div>
+</div>
 
           <div>
             <div
@@ -1425,6 +1437,7 @@ function AboutSection() {
               compromises — just your perfect fit, made with patience and passion.
             </p>
           </div>
+          
         </div>
       </div>
     </section>
@@ -2011,6 +2024,190 @@ function Footer() {
   );
 }
 
+function CustomerLove() {
+  const [items, setItems] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/review-highlights")
+      .then((res) => res.json())
+      .then((data) => setItems(data))
+      .catch((err) => console.error("Customer Love error:", err));
+  }, []);
+
+  if (!items.length) return null;
+
+  return (
+    <section style={{ padding: "90px 0", position: "relative", zIndex: 1 }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <div
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: 13,
+              color: COLORS.rose,
+              letterSpacing: "0.2em",
+              marginBottom: 10,
+            }}
+          >
+            CUSTOMER LOVE
+          </div>
+
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: "clamp(30px,4vw,48px)",
+              fontWeight: 700,
+              color: COLORS.tobago,
+              marginBottom: 14,
+            }}
+          >
+            Loved by Our Girls
+          </h2>
+
+          <p
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: 18,
+              color: COLORS.mutedText,
+              maxWidth: 620,
+              margin: "0 auto",
+              lineHeight: 1.8,
+            }}
+          >
+            A glimpse of beautiful moments shared by our customers.
+          </p>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            gap: 22,
+            flexWrap: "wrap",
+            justifyContent: "center",
+          }}
+        >
+          {items.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => setSelectedItem(item)}
+              style={{
+                textAlign: "center",
+                cursor: "pointer",
+                width: 120,
+              }}
+            >
+              <div
+                style={{
+                  width: 96,
+                  height: 96,
+                  margin: "0 auto 10px",
+                  borderRadius: "50%",
+                  padding: 3,
+                  background:
+                    "linear-gradient(135deg, #DBA1A2 0%, #E8CFC3 100%)",
+                  boxShadow: "0 6px 18px rgba(219,161,162,0.22)",
+                }}
+              >
+                <img
+                  src={`http://127.0.0.1:8000${item.image_url}`}
+                  alt={item.title}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    borderRadius: "50%",
+                    display: "block",
+                    border: "3px solid white",
+                  }}
+                />
+              </div>
+
+              <div
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: 16,
+                  color: COLORS.tobago,
+                  marginBottom: 4,
+                }}
+              >
+                {item.title}
+              </div>
+
+              <div
+                style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: 14,
+                  color: COLORS.mutedText,
+                }}
+              >
+                {item.subtitle}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {selectedItem && (
+          <div
+            onClick={() => setSelectedItem(null)}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.65)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 999,
+              padding: 24,
+            }}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: "#fff",
+                padding: 18,
+                borderRadius: 20,
+                maxWidth: 520,
+                width: "100%",
+              }}
+            >
+              <img
+                src={`http://127.0.0.1:8000${selectedItem.image_url}`}
+                alt={selectedItem.title}
+                style={{
+                  width: "100%",
+                  borderRadius: 16,
+                  display: "block",
+                }}
+              />
+              <div
+                style={{
+                  marginTop: 14,
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: 22,
+                  color: COLORS.tobago,
+                }}
+              >
+                {selectedItem.title}
+              </div>
+              <div
+                style={{
+                  marginTop: 6,
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: 17,
+                  color: COLORS.mutedText,
+                }}
+              >
+                {selectedItem.subtitle}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function UserSite() {
   const [activeSection, setActiveSection] = useState("home");
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -2071,10 +2268,59 @@ useEffect(() => {
 
       <div ref={sectionRef}>
 {activeSection === "home" && (
-  <HeroSection
-    setActiveSection={setActiveSection}
-    products={products}
-  />
+  <>
+    <HeroSection
+      setActiveSection={setActiveSection}
+      products={products}
+    />
+
+    {/* ✨ Soft glowing divider */}
+<div
+  style={{
+    position: "relative",
+    width: "70%",
+    height: 2,
+    borderRadius: 999,
+    background:
+      "linear-gradient(90deg, rgba(255,255,255,0) 0%, #E8CFC3 25%, #DBA1A2 50%, #E8CFC3 75%, rgba(255,255,255,0) 100%)",
+    boxShadow:
+      "0 0 20px rgba(219,161,162,0.4), 0 0 30px rgba(232,207,195,0.3)",
+  }}
+>
+  {/* Left icon */}
+  <span
+    style={{
+      position: "absolute",
+      left: -12,
+      top: "50%",
+      transform: "translateY(-50%)",
+      color: "#DBA1A2",
+      fontSize: 14,
+      opacity: 0.9,
+    }}
+  >
+    ✧
+  </span>
+
+  {/* Right icon */}
+  <span
+    style={{
+      position: "absolute",
+      right: -12,
+      top: "50%",
+      transform: "translateY(-50%)",
+      color: "#DBA1A2",
+      fontSize: 14,
+      opacity: 0.9,
+    }}
+  >
+    ✧   ✦   ✩   ♥
+  </span>
+</div>
+
+    <AboutSection />
+    <CustomerLove />
+  </>
 )}
 {activeSection === "shop" && !selectedProduct && (
   <ShopSection products={products} onViewProduct={setSelectedProduct} />

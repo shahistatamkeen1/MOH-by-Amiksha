@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 import psycopg2
 import os
 import shutil
+from typing import Optional
 from typing import List
 
 app = FastAPI()
@@ -103,6 +104,133 @@ def create_product(
     main_image: UploadFile = File(...),
     sub_images: List[UploadFile] = File([])
 ):
+    pass
+
+@app.get("/review-highlights")
+def get_review_highlights():
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, title, subtitle, image_url, sort_order, is_active
+        FROM review_highlights
+        WHERE is_active = TRUE
+        ORDER BY sort_order, id;
+    """)
+
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return [
+        {
+            "id": row[0],
+            "title": row[1],
+            "subtitle": row[2],
+            "image_url": row[3],
+            "sort_order": row[4],
+            "is_active": row[5],
+        }
+        for row in rows
+    ]
+
+
+@app.get("/admin/review-highlights")
+def admin_get_review_highlights():
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, title, subtitle, image_url, sort_order, is_active
+        FROM review_highlights
+        ORDER BY sort_order, id;
+    """)
+
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return [
+        {
+            "id": row[0],
+            "title": row[1],
+            "subtitle": row[2],
+            "image_url": row[3],
+            "sort_order": row[4],
+            "is_active": row[5],
+        }
+        for row in rows
+    ]
+
+
+@app.post("/admin/review-highlights")
+def create_review_highlight(
+    title: str = Form(...),
+    subtitle: str = Form(""),
+    sort_order: int = Form(0),
+    is_active: bool = Form(True),
+    image: UploadFile = File(...)
+):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    image_path = f"/uploads/{image.filename}"
+    with open(os.path.join(UPLOAD_DIR, image.filename), "wb") as buffer:
+        shutil.copyfileobj(image.file, buffer)
+
+    cur.execute("""
+        INSERT INTO review_highlights (title, subtitle, image_url, sort_order, is_active)
+        VALUES (%s, %s, %s, %s, %s)
+        RETURNING id;
+    """, (title, subtitle, image_path, sort_order, is_active))
+
+    highlight_id = cur.fetchone()[0]
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return {"message": "Review highlight created", "id": highlight_id}
+
+
+@app.put("/admin/review-highlights/{highlight_id}")
+def update_review_highlight(
+    highlight_id: int,
+    title: str = Form(...),
+    subtitle: str = Form(""),
+    sort_order: int = Form(0),
+    is_active: bool = Form(True)
+):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE review_highlights
+        SET title = %s,
+            subtitle = %s,
+            sort_order = %s,
+            is_active = %s
+        WHERE id = %s
+    """, (title, subtitle, sort_order, is_active, highlight_id))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return {"message": "Review highlight updated"}
+
+
+@app.delete("/admin/review-highlights/{highlight_id}")
+def delete_review_highlight(highlight_id: int):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM review_highlights WHERE id = %s", (highlight_id,))
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    return {"message": "Review highlight deleted"}
     conn = get_connection()
     cur = conn.cursor()
 
