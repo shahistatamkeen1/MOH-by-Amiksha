@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
+const API_BASE = "http://127.0.0.1:8000";
 const WHATSAPP_NUMBER = "919912021000";
-
-
 
 const COLORS = {
   cream: "#F9F6F1",
@@ -17,98 +16,16 @@ const COLORS = {
   mutedText: "#8A6F6B",
 };
 
-const API_BASE = "http://127.0.0.1:8000";
-
-function getImageUrl(path) {
-  if (!path) return "";
-
-  // If it's already full URL → return as-is
-  if (path.startsWith("http")) return path;
-
-  // If it's fallback (frontend public images)
-  if (path.startsWith("/images")) return path;
-
-  // Otherwise it's backend (/uploads/...)
-  return `${API_BASE}${path}`;
+function openWhatsApp(message) {
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  window.open(url, "_blank");
 }
 
-const fallbackProducts = [
-  {
-    id: 1,
-    name: "Powder Pink Floral Dress",
-    price: 4999,
-    category: "new_arrivals",
-    collection: "Bloom",
-    image: "/images/look1.jpg",
-    images: [
-      "/images/look1.jpg",
-      "/images/look1-2.png",
-      "/images/look1-3.png",
-    ],
-    shortDesc:
-      "Elegant powder pink dress with soft floral detailing and a graceful feminine silhouette.",
-    intro:
-      "A graceful powder pink dress designed to celebrate effortless femininity. The silhouette features a structured bodice paired with a softly flowing skirt, creating a flattering and elegant shape for every occasion. Handcrafted with delicate floral detailing, the piece reflects a blend of traditional artistry and modern design. The subtle textures and soft color palette make it perfect for both daytime elegance and evening charm.",
-    fit:
-      "Designed for a structured yet comfortable fit at the bust and waist, the dress flows gently into a relaxed silhouette. The balanced proportions enhance movement while maintaining a refined aesthetic.",
-    sizeGuide:
-      "Choose your regular size for a comfortable fit. The garment allows slight flexibility for adjustments, making it suitable for custom tailoring if needed.",
-    care:
-      "Dry clean recommended to preserve fabric quality and detailing. Store in a cool, dry place to maintain its shape and color.",
-    sizes: ["XS", "S", "M", "L", "XL"],
-    customizable: true,
-  },
-  {
-    id: 2,
-    name: "Soft Rose Top",
-    price: 3299,
-    category: "collections",
-    collection: "Petal",
-    image: "/images/look2.jpg",
-    images: [
-      "/images/look2.jpg",
-    ],
-    shortDesc:
-      "A soft rose-toned top designed for understated elegance and everyday sophistication.",
-    intro:
-      "A refined rose-toned piece that balances simplicity with delicate femininity. Ideal for easy styling across day and evening looks.",
-    fit:
-      "Designed with a comfortable fit that feels polished without being restrictive.",
-    sizeGuide:
-      "Choose your regular size for the best fit. For a more relaxed feel, size up.",
-    care: "Gentle dry clean recommended.",
-    sizes: ["XS", "S", "M", "L", "XL"],
-    customizable: true,
-  },
-  {
-    id: 3,
-    name: "Midnight Blue Floral Dress",
-    price: 5499,
-    category: "collections",
-    collection: "Rose Garden",
-    image: "/images/look3.jpg",
-    images: [
-      "/images/look3.jpg",
-    ],
-    shortDesc:
-      "A charming floral dress in deep blue, perfect for statement styling and special outings.",
-    intro:
-      "A graceful deep blue floral silhouette designed for elegant outings and statement dressing. It combines floral artistry with a timeless feminine shape.",
-    fit:
-      "Designed for a flattering fit with soft structure and fluid movement.",
-    sizeGuide:
-      "Choose your regular size for a comfortable fit. Tailoring can refine the final silhouette if needed.",
-    care: "Dry clean recommended to maintain color and finish.",
-    sizes: ["XS", "S", "M", "L", "XL"],
-    customizable: true,
-  },
-];
-
-function openWhatsApp(message) {
-  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    message
-  )}`;
-  window.open(url, "_blank");
+function toImageUrl(path) {
+  if (!path) return "/images/logo.jpeg";
+  if (path.startsWith("http")) return path;
+  if (path.startsWith("/uploads")) return `${API_BASE}${path}`;
+  return path;
 }
 
 const flowerSVG = (x, y, size, color, opacity = 0.6) => `
@@ -116,10 +33,14 @@ const flowerSVG = (x, y, size, color, opacity = 0.6) => `
     ${[0, 60, 120, 180, 240, 300]
       .map(
         (a) => `
-      <ellipse cx="${Math.cos((a * Math.PI) / 180) * size * 0.8}" cy="${
-          Math.sin((a * Math.PI) / 180) * size * 0.8
-        }"
-        rx="${size * 0.5}" ry="${size * 0.3}" transform="rotate(${a})" fill="${color}" />
+      <ellipse
+        cx="${Math.cos((a * Math.PI) / 180) * size * 0.8}"
+        cy="${Math.sin((a * Math.PI) / 180) * size * 0.8}"
+        rx="${size * 0.5}"
+        ry="${size * 0.3}"
+        transform="rotate(${a})"
+        fill="${color}"
+      />
     `
       )
       .join("")}
@@ -149,18 +70,15 @@ function FloralBg() {
         </filter>
       </defs>
       <g filter="url(#soft)">
-        {flowerSVG(80, 120, 36, COLORS.rose)}
-        {flowerSVG(200, 50, 22, COLORS.champagne)}
-        {flowerSVG(380, 180, 28, COLORS.blush)}
-        {flowerSVG(1200, 80, 42, COLORS.rose)}
-        {flowerSVG(1350, 200, 26, COLORS.champagne)}
-        {flowerSVG(1100, 300, 18, COLORS.blush)}
-        {flowerSVG(60, 600, 32, COLORS.champagne)}
-        {flowerSVG(150, 750, 20, COLORS.rose)}
-        {flowerSVG(1380, 700, 38, COLORS.blush)}
-        {flowerSVG(700, 30, 16, COLORS.rose)}
-        {flowerSVG(900, 860, 24, COLORS.champagne)}
-        {flowerSVG(500, 820, 30, COLORS.rose)}
+        <g dangerouslySetInnerHTML={{ __html: flowerSVG(80, 120, 36, COLORS.rose) }} />
+        <g dangerouslySetInnerHTML={{ __html: flowerSVG(200, 50, 22, COLORS.champagne) }} />
+        <g dangerouslySetInnerHTML={{ __html: flowerSVG(380, 180, 28, COLORS.blush) }} />
+        <g dangerouslySetInnerHTML={{ __html: flowerSVG(1200, 80, 42, COLORS.rose) }} />
+        <g dangerouslySetInnerHTML={{ __html: flowerSVG(1350, 200, 26, COLORS.champagne) }} />
+        <g dangerouslySetInnerHTML={{ __html: flowerSVG(1100, 300, 18, COLORS.blush) }} />
+        <g dangerouslySetInnerHTML={{ __html: flowerSVG(60, 600, 32, COLORS.champagne) }} />
+        <g dangerouslySetInnerHTML={{ __html: flowerSVG(150, 750, 20, COLORS.rose) }} />
+        <g dangerouslySetInnerHTML={{ __html: flowerSVG(1380, 700, 38, COLORS.blush) }} />
       </g>
     </svg>
   );
@@ -175,6 +93,14 @@ function Nav({ activeSection, setActiveSection, mobileOpen, setMobileOpen }) {
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
+  const navItems = [
+    ["home", "Home"],
+    ["shop", "Shop"],
+    ["collections", "Collections"],
+    ["customize", "Customize"],
+    ["about", "About"],
+  ];
+
   return (
     <nav
       style={{
@@ -183,12 +109,9 @@ function Nav({ activeSection, setActiveSection, mobileOpen, setMobileOpen }) {
         left: 0,
         right: 0,
         zIndex: 100,
-        background: scrolled
-          ? "rgba(249,246,241,0.97)"
-          : "rgba(249,246,241,0.85)",
+        background: scrolled ? "rgba(249,246,241,0.97)" : "rgba(249,246,241,0.85)",
         backdropFilter: "blur(12px)",
         borderBottom: `1px solid ${COLORS.blush}`,
-        transition: "background 0.3s",
       }}
     >
       <div
@@ -215,17 +138,8 @@ function Nav({ activeSection, setActiveSection, mobileOpen, setMobileOpen }) {
           />
         </div>
 
-        <div
-          style={{ display: "flex", gap: 8, alignItems: "center" }}
-          className="nav-links"
-        >
-          {[
-            ["home", "Home"],
-            ["shop", "Shop"],
-            ["collections", "Collections"],
-            ["customize", "Customize"],
-            ["about", "About"],
-          ].map(([k, v]) => (
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }} className="nav-links">
+          {navItems.map(([k, v]) => (
             <button
               key={k}
               onClick={() => setActiveSection(k)}
@@ -239,7 +153,6 @@ function Nav({ activeSection, setActiveSection, mobileOpen, setMobileOpen }) {
                 fontSize: 15,
                 letterSpacing: "0.05em",
                 cursor: "pointer",
-                transition: "all 0.2s",
                 fontWeight: 500,
               }}
             >
@@ -272,42 +185,16 @@ function Nav({ activeSection, setActiveSection, mobileOpen, setMobileOpen }) {
 
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          style={{
-            display: "none",
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-          }}
+          style={{ display: "none", background: "transparent", border: "none", cursor: "pointer" }}
           className="burger"
         >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke={COLORS.tobago}
-            strokeWidth="2"
-          >
-            <path d="M3 6h18M3 12h18M3 18h18" />
-          </svg>
+          ☰
         </button>
       </div>
 
       {mobileOpen && (
-        <div
-          style={{
-            background: COLORS.cream,
-            padding: 20,
-            borderTop: `1px solid ${COLORS.blush}`,
-          }}
-        >
-          {[
-            ["home", "Home"],
-            ["shop", "Shop"],
-            ["collections", "Collections"],
-            ["customize", "Customize"],
-            ["about", "About"],
-          ].map(([k, v]) => (
+        <div style={{ background: COLORS.cream, padding: 20, borderTop: `1px solid ${COLORS.blush}` }}>
+          {navItems.map(([k, v]) => (
             <button
               key={k}
               onClick={() => {
@@ -338,36 +225,21 @@ function Nav({ activeSection, setActiveSection, mobileOpen, setMobileOpen }) {
 }
 
 function ProductHero({ products }) {
-const newArrivalProducts = [...products]
-  .filter((p) => p.category === "new_arrivals")
-  .reverse()
-  .slice(0, 3);
+  const heroImages = products
+    .filter((p) => p.category === "new_arrivals")
+    .map((p) => toImageUrl(p.image));
 
-  const heroItems =
-    newArrivalProducts.length > 0
-      ? newArrivalProducts.map((p) => ({
-          image: p.image,
-          name: p.name,
-        }))
-      : [
-          { image: "/images/look1.jpg", name: "MOH Look 1" },
-          { image: "/images/look2.jpg", name: "MOH Look 2" },
-          { image: "/images/look3.jpg", name: "MOH Look 3" },
-        ];
+  const fallbackImages = ["/images/look1.jpg", "/images/look2.jpg", "/images/look3.jpg"];
+  const displayImages = heroImages.length ? heroImages : fallbackImages;
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    setCurrentIndex(0);
-  }, [products]);
-
-  useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % heroItems.length);
+      setCurrentIndex((prev) => (prev + 1) % displayImages.length);
     }, 3000);
-
     return () => clearInterval(timer);
-  }, [heroItems.length]);
+  }, [displayImages.length]);
 
   return (
     <div
@@ -391,11 +263,11 @@ const newArrivalProducts = [...products]
           position: "relative",
         }}
       >
-        {heroItems.map((item, index) => (
+        {displayImages.map((img, index) => (
           <img
-            key={`${item.name}-${index}`}
-            src={getImageUrl(item.image)}
-            alt={item.name}
+            key={img + index}
+            src={img}
+            alt={`MOH product ${index + 1}`}
             style={{
               position: "absolute",
               inset: 0,
@@ -412,8 +284,7 @@ const newArrivalProducts = [...products]
           style={{
             position: "absolute",
             inset: 0,
-            background:
-              "linear-gradient(to top, rgba(66,43,35,0.28), rgba(66,43,35,0.05))",
+            background: "linear-gradient(to top, rgba(66,43,35,0.28), rgba(66,43,35,0.05))",
           }}
         />
 
@@ -479,7 +350,7 @@ const newArrivalProducts = [...products]
           width: "100%",
         }}
       >
-        {heroItems.map((_, index) => (
+        {displayImages.map((_, index) => (
           <span
             key={index}
             onClick={() => setCurrentIndex(index)}
@@ -570,10 +441,9 @@ function HeroSection({ setActiveSection, products }) {
               maxWidth: 440,
             }}
           >
-            Handcrafted women's fashion from the heart of India. Each piece is a
-            canvas of femininity — made to order, made for you.
+            Handcrafted women's fashion from the heart of India. Each piece is a canvas of femininity — made to
+            order, made for you.
           </p>
-          
 
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
             <button
@@ -613,43 +483,38 @@ function HeroSection({ setActiveSection, products }) {
           </div>
 
           <div style={{ display: "flex", gap: 32, marginTop: 48 }}>
-            {[["200+", "Happy Customers"], ["100%", "Handcrafted"], ["Made", "to Order"]].map(
-              ([n, l]) => (
-                <div key={l}>
-                  <div
-                    style={{
-                      fontFamily: "'Playfair Display',serif",
-                      fontSize: 22,
-                      fontWeight: 700,
-                      color: COLORS.tobago,
-                    }}
-                  >
-                    {n}
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: "'Cormorant Garamond',serif",
-                      fontSize: 13,
-                      color: COLORS.mutedText,
-                      letterSpacing: "0.05em",
-                    }}
-                  >
-                    {l}
-                  </div>
+            {[
+              ["200+", "Happy Customers"],
+              ["100%", "Handcrafted"],
+              ["Made", "to Order"],
+            ].map(([n, l]) => (
+              <div key={l}>
+                <div
+                  style={{
+                    fontFamily: "'Playfair Display',serif",
+                    fontSize: 22,
+                    fontWeight: 700,
+                    color: COLORS.tobago,
+                  }}
+                >
+                  {n}
                 </div>
-              )
-            )}
+                <div
+                  style={{
+                    fontFamily: "'Cormorant Garamond',serif",
+                    fontSize: 13,
+                    color: COLORS.mutedText,
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  {l}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div
-          style={{
-            position: "relative",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
+        <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center" }}>
           <ProductHero products={products} />
         </div>
       </div>
@@ -659,8 +524,6 @@ function HeroSection({ setActiveSection, products }) {
 
 function ProductCard({ p, onWhatsapp, onViewProduct }) {
   const [hovered, setHovered] = useState(false);
-  const colors = [COLORS.blush, COLORS.champagne, "#E8D5C4", "#F5E6E8", COLORS.sage];
-  const bg = colors[p.id % colors.length];
 
   return (
     <div
@@ -674,16 +537,14 @@ function ProductCard({ p, onWhatsapp, onViewProduct }) {
         border: `1px solid ${COLORS.blush}`,
         transition: "transform 0.3s, box-shadow 0.3s",
         transform: hovered ? "translateY(-6px)" : "translateY(0)",
-        boxShadow: hovered
-          ? `0 20px 50px rgba(219,161,162,0.22)`
-          : "0 4px 16px rgba(0,0,0,0.05)",
+        boxShadow: hovered ? `0 20px 50px rgba(219,161,162,0.22)` : "0 4px 16px rgba(0,0,0,0.05)",
         cursor: "pointer",
       }}
     >
       <div
         style={{
           height: 360,
-          background: bg,
+          background: COLORS.champagne,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -691,7 +552,8 @@ function ProductCard({ p, onWhatsapp, onViewProduct }) {
           overflow: "hidden",
         }}
       >
-        <img src={getImageUrl(p.image)}
+        <img
+          src={toImageUrl(p.image)}
           alt={p.name}
           style={{
             width: "100%",
@@ -784,7 +646,7 @@ function ProductCard({ p, onWhatsapp, onViewProduct }) {
               color: COLORS.tobago,
             }}
           >
-            ₹{p.price.toLocaleString()}
+            ₹{Number(p.price).toLocaleString()}
           </div>
 
           <button
@@ -814,7 +676,6 @@ function ProductCard({ p, onWhatsapp, onViewProduct }) {
 
 function ShopSection({ products, onViewProduct }) {
   const [filter, setFilter] = useState("all");
-  const SITE_URL = API_BASE;
 
   const filtered =
     filter === "all"
@@ -824,15 +685,13 @@ function ShopSection({ products, onViewProduct }) {
       : products.filter((p) => p.category === "collections");
 
   const handleWhatsapp = (p) => {
-    openWhatsApp(
-      `Hi! I'm interested in:
+    openWhatsApp(`Hi! I'm interested in:
 
 Product: ${p.name}
-Price: ₹${p.price.toLocaleString()}
-Image: ${getImageUrl(p.image)}
+Price: ₹${Number(p.price).toLocaleString()}
+Image: ${toImageUrl(p.image)}
 
-Please share more details.`
-    );
+Please share more details.`);
   };
 
   return (
@@ -870,61 +729,41 @@ Please share more details.`
               margin: "0 auto",
             }}
           >
-            Discover handcrafted women&apos;s wear in soft floral tones —
-            designed for elegance, comfort, and customization.
+            Discover handcrafted women&apos;s wear in soft floral tones — designed for elegance, comfort, and
+            customization.
           </p>
         </div>
-        
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: 12,
-            marginBottom: 50,
-            flexWrap: "wrap",
-          }}
-        >
-          {[["all", "ALL"], ["new_arrivals", "New Arrivals"], ["collections", "Collections"]].map(
-            ([k, v]) => (
-              <button
-                key={k}
-                onClick={() => setFilter(k)}
-                style={{
-                  background: filter === k ? COLORS.tobago : COLORS.white,
-                  color: filter === k ? COLORS.cream : COLORS.tobago,
-                  border: `1.5px solid ${
-                    filter === k ? COLORS.tobago : COLORS.blush
-                  }`,
-                  borderRadius: 40,
-                  padding: "10px 28px",
-                  fontSize: 15,
-                  cursor: "pointer",
-                  fontFamily: "'Cormorant Garamond',serif",
-                  fontWeight: 500,
-                  letterSpacing: "0.05em",
-                }}
-              >
-                {v}
-              </button>
-            )
-          )}
+        <div style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 50, flexWrap: "wrap" }}>
+          {[
+            ["all", "ALL"],
+            ["new_arrivals", "New Arrivals"],
+            ["collections", "Collections"],
+          ].map(([k, v]) => (
+            <button
+              key={k}
+              onClick={() => setFilter(k)}
+              style={{
+                background: filter === k ? COLORS.tobago : COLORS.white,
+                color: filter === k ? COLORS.cream : COLORS.tobago,
+                border: `1.5px solid ${filter === k ? COLORS.tobago : COLORS.blush}`,
+                borderRadius: 40,
+                padding: "10px 28px",
+                fontSize: 15,
+                cursor: "pointer",
+                fontFamily: "'Cormorant Garamond',serif",
+                fontWeight: 500,
+                letterSpacing: "0.05em",
+              }}
+            >
+              {v}
+            </button>
+          ))}
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-            gap: 28,
-          }}
-        >
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 28 }}>
           {filtered.map((p) => (
-            <ProductCard
-              key={p.id}
-              p={p}
-              onWhatsapp={handleWhatsapp}
-              onViewProduct={onViewProduct}
-            />
+            <ProductCard key={p.id} p={p} onWhatsapp={handleWhatsapp} onViewProduct={onViewProduct} />
           ))}
         </div>
       </div>
@@ -988,13 +827,7 @@ function CollectionsSection({ products }) {
           </h2>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
-            gap: 28,
-          }}
-        >
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 28 }}>
           {collections.map((col) => (
             <div
               key={col.name}
@@ -1060,6 +893,7 @@ function CollectionsSection({ products }) {
                   color: COLORS.cream,
                   borderRadius: 40,
                   padding: "10px 24px",
+                  textDecoration: "none",
                   fontFamily: "'Cormorant Garamond',serif",
                   fontSize: 14,
                   fontWeight: 600,
@@ -1088,23 +922,22 @@ function CustomizeSection({ products }) {
     name: "",
   });
 
-  const customizableItems = (products || []).filter((p) => p.customizable);
+  const customizableItems = products.filter((p) => p.customizable);
 
   const handleWhatsapp = () => {
     if (!form.piece || !form.size || !form.name) return;
 
-    openWhatsApp(
-      `Hi! I'd like to place a custom order:
+    openWhatsApp(`Hi! I'd like to place a custom order for:
 
-Name: ${form.name}
 Piece: ${form.piece}
 Size: ${form.size}
 Color preference: ${form.color || "Open to suggestions"}
 Fabric preference: ${form.fabric || "Open to suggestions"}
 Notes: ${form.notes || "None"}
 
-Please let me know the pricing and timeline.`
-    );
+Name: ${form.name}
+
+Please let me know the pricing and timeline!`);
   };
 
   return (
@@ -1143,8 +976,8 @@ Please let me know the pricing and timeline.`
               lineHeight: 1.7,
             }}
           >
-            Every body is unique. Tell us your vision and we&apos;ll craft it with
-            care — your size, your color, your story.
+            Every body is unique. Tell us your vision and we&apos;ll craft it with care — your size, your color,
+            your story.
           </p>
         </div>
 
@@ -1160,12 +993,7 @@ Please let me know the pricing and timeline.`
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
             {[
               { label: "Your Name *", key: "name", type: "text", placeholder: "Zara Ahmed" },
-              {
-                label: "Which piece? *",
-                key: "piece",
-                type: "select",
-                options: customizableItems.map((p) => p.name),
-              },
+              { label: "Which piece? *", key: "piece", type: "select", options: customizableItems.map((p) => p.name) },
               {
                 label: "Your Size *",
                 key: "size",
@@ -1259,6 +1087,7 @@ Please let me know the pricing and timeline.`
               >
                 Additional Notes
               </label>
+
               <textarea
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
@@ -1318,72 +1147,66 @@ Please let me know the pricing and timeline.`
 
 function AboutSection() {
   return (
-    <section style={{ padding: "100px 0 80px", position: "relative", zIndex: 1 }}>
+    <section id="about" style={{ padding: "100px 0 80px", position: "relative", zIndex: 1 }}>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 80,
-            alignItems: "center",
-          }}
-        >
-          <div
-  style={{
-    position: "relative",
-    width: "100%",
-    maxWidth: 460,
-    aspectRatio: "4/5",
-    borderRadius: "28px 120px 28px 120px",
-    overflow: "hidden",
-    boxShadow: "0 18px 50px rgba(0,0,0,0.10)",
-    background: COLORS.blush,
-  }}
->
-  <img
-    src="/images/about-founder.jpg"
-    alt="Founder"
-    style={{
-      width: "100%",
-      height: "100%",
-      objectFit: "cover",
-      display: "block",
-    }}
-  />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
+          <div style={{ position: "relative" }}>
+            <div
+              style={{
+                width: "100%",
+                maxWidth: 470,
+                aspectRatio: "4/5",
+                borderRadius: "28% 12% 26% 14% / 16% 24% 18% 26%",
+                overflow: "hidden",
+                boxShadow: "0 18px 45px rgba(66,43,35,0.12)",
+                background: COLORS.blush,
+              }}
+            >
+              <img
+                src="/images/about-founder.jpg"
+                alt="Founder"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
+                }}
+              />
+            </div>
 
-  <div
-    style={{
-      position: "absolute",
-      bottom: 20,
-      right: 20,
-      background: COLORS.white,
-      borderRadius: 20,
-      padding: "20px 28px",
-      border: `1px solid ${COLORS.blush}`,
-      boxShadow: `0 8px 30px rgba(219,161,162,0.15)`,
-    }}
-  >
-    <div
-      style={{
-        fontFamily: "'Playfair Display',serif",
-        fontSize: 28,
-        fontWeight: 700,
-        color: COLORS.tobago,
-      }}
-    >
-      2020
-    </div>
-    <div
-      style={{
-        fontFamily: "'Cormorant Garamond',serif",
-        fontSize: 14,
-        color: COLORS.mutedText,
-      }}
-    >
-      Founded with love
-    </div>
-  </div>
-</div>
+            <div
+              style={{
+                position: "absolute",
+                bottom: 24,
+                right: 24,
+                background: "rgba(255,255,255,0.95)",
+                borderRadius: 22,
+                padding: "20px 28px",
+                border: `1px solid ${COLORS.blush}`,
+                boxShadow: `0 8px 30px rgba(219,161,162,0.15)`,
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "'Playfair Display',serif",
+                  fontSize: 28,
+                  fontWeight: 700,
+                  color: COLORS.tobago,
+                }}
+              >
+                2020
+              </div>
+              <div
+                style={{
+                  fontFamily: "'Cormorant Garamond',serif",
+                  fontSize: 14,
+                  color: COLORS.mutedText,
+                }}
+              >
+                Founded with love
+              </div>
+            </div>
+          </div>
 
           <div>
             <div
@@ -1397,6 +1220,7 @@ function AboutSection() {
             >
               OUR STORY
             </div>
+
             <h2
               style={{
                 fontFamily: "'Playfair Display',serif",
@@ -1411,6 +1235,7 @@ function AboutSection() {
               <br />
               <em style={{ color: COLORS.deepRose, fontStyle: "italic" }}>for you</em>
             </h2>
+
             <p
               style={{
                 fontFamily: "'Cormorant Garamond',serif",
@@ -1420,10 +1245,10 @@ function AboutSection() {
                 marginBottom: 20,
               }}
             >
-              MOH by Amiksha began as a love letter to Indian femininity — a desire
-              to create clothing that makes every woman feel beautiful, seen, and
-              celebrated.
+              MOH by Amiksha began as a love letter to Indian femininity — a desire to create clothing that makes
+              every woman feel beautiful, seen, and celebrated.
             </p>
+
             <p
               style={{
                 fontFamily: "'Cormorant Garamond',serif",
@@ -1433,37 +1258,299 @@ function AboutSection() {
                 marginBottom: 36,
               }}
             >
-              Every piece is handcrafted to order, which means no rushing, no
-              compromises — just your perfect fit, made with patience and passion.
+              Every piece is handcrafted to order, which means no rushing, no compromises — just your perfect fit,
+              made with patience and passion.
             </p>
           </div>
-          
         </div>
       </div>
     </section>
   );
 }
 
-function ProductDetailView({ product, products, onBack }) {
+function CustomerLove() {
+  const [items, setItems] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/review-highlights`)
+      .then((res) => res.json())
+      .then((data) => setItems(Array.isArray(data) ? data : []))
+      .catch((err) => console.error("Customer Love error:", err));
+  }, []);
+
+  if (!items.length) return null;
+
+  return (
+    <section style={{ padding: "90px 0", position: "relative", zIndex: 1 }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <div
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: 13,
+              color: COLORS.rose,
+              letterSpacing: "0.2em",
+              marginBottom: 10,
+            }}
+          >
+            CUSTOMER LOVE
+          </div>
+
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: "clamp(30px,4vw,48px)",
+              fontWeight: 700,
+              color: COLORS.tobago,
+              marginBottom: 14,
+            }}
+          >
+            Loved by Our Girls
+          </h2>
+
+          <p
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: 18,
+              color: COLORS.mutedText,
+              maxWidth: 620,
+              margin: "0 auto",
+              lineHeight: 1.8,
+            }}
+          >
+            A glimpse of beautiful moments shared by our customers.
+          </p>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            gap: 22,
+            flexWrap: "wrap",
+            justifyContent: "center",
+          }}
+        >
+          {items.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => {
+                setSelectedItem(item);
+                setActiveImageIndex(0);
+              }}
+              style={{
+                textAlign: "center",
+                cursor: "pointer",
+                width: 120,
+              }}
+            >
+              <div
+                style={{
+                  width: 96,
+                  height: 96,
+                  margin: "0 auto 10px",
+                  borderRadius: "50%",
+                  padding: 3,
+                  background: "linear-gradient(135deg, #DBA1A2 0%, #E8CFC3 100%)",
+                  boxShadow: "0 6px 18px rgba(219,161,162,0.22)",
+                }}
+              >
+                <img
+                  src={item.images?.length ? `${API_BASE}${item.images[0]}` : "/images/logo.jpeg"}
+                  alt={item.title}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    borderRadius: "50%",
+                    display: "block",
+                    border: "3px solid white",
+                  }}
+                />
+              </div>
+
+              <div
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: 16,
+                  color: COLORS.tobago,
+                  marginBottom: 4,
+                }}
+              >
+                {item.title}
+              </div>
+
+              <div
+                style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: 14,
+                  color: COLORS.mutedText,
+                }}
+              >
+                {item.subtitle}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {selectedItem && (
+          <div
+            onClick={() => setSelectedItem(null)}
+            style={{
+              position: "fixed",
+              inset: 0,
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              background: "rgba(0,0,0,0.35)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 999,
+              padding: 24,
+            }}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: "rgba(255,255,255,0.95)",
+                border: "1px solid rgba(255,255,255,0.4)",
+                padding: 18,
+                borderRadius: 24,
+                maxWidth: 540,
+                width: "100%",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+              }}
+            >
+              <img
+                src={`${API_BASE}${selectedItem.images[activeImageIndex]}`}
+                alt={selectedItem.title}
+                style={{
+                  width: "100%",
+                  borderRadius: 16,
+                  display: "block",
+                  maxHeight: "70vh",
+                  objectFit: "cover",
+                }}
+              />
+
+              <div
+                style={{
+                  marginTop: 14,
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: 22,
+                  color: COLORS.tobago,
+                }}
+              >
+                {selectedItem.title}
+              </div>
+
+              <div
+                style={{
+                  marginTop: 6,
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: 17,
+                  color: COLORS.mutedText,
+                }}
+              >
+                {selectedItem.subtitle}
+              </div>
+
+              {selectedItem.images.length > 1 && (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: 18,
+                    gap: 12,
+                  }}
+                >
+                  <button
+                    onClick={() =>
+                      setActiveImageIndex((prev) =>
+                        prev === 0 ? selectedItem.images.length - 1 : prev - 1
+                      )
+                    }
+                    style={{
+                      background: COLORS.tobago,
+                      color: COLORS.white,
+                      border: "none",
+                      borderRadius: 10,
+                      padding: "10px 16px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Previous
+                  </button>
+
+                  <div
+                    style={{
+                      fontFamily: "'Cormorant Garamond', serif",
+                      color: COLORS.mutedText,
+                      fontSize: 16,
+                    }}
+                  >
+                    {activeImageIndex + 1} / {selectedItem.images.length}
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      setActiveImageIndex((prev) =>
+                        prev === selectedItem.images.length - 1 ? 0 : prev + 1
+                      )
+                    }
+                    style={{
+                      background: COLORS.tobago,
+                      color: COLORS.white,
+                      border: "none",
+                      borderRadius: 10,
+                      padding: "10px 16px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function ProductDetailView({ product, onBack, onOpenProduct }) {
+  const imageList = product.images?.length ? product.images : [{ id: "main", url: product.image }];
+
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || "S");
   const [quantity, setQuantity] = useState(1);
-  const [mainImage, setMainImage] = useState(product.images?.[0] || product.image);
+  const [mainImage, setMainImage] = useState(imageList[0].url);
 
-  const relatedProducts = products.filter((p) => p.id !== product.id).slice(0, 4);
+  const relatedProducts = [];
+  const [allProducts, setAllProducts] = useState([]);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/products`)
+      .then((res) => res.json())
+      .then((data) => setAllProducts(Array.isArray(data) ? data : []))
+      .catch((err) => console.error(err));
+  }, []);
+
+  const related = allProducts.filter((p) => p.id !== product.id).slice(0, 4);
 
   const handleWhatsAppOrder = () => {
-    openWhatsApp(
-      `Hi! I'm interested in this product:
+    openWhatsApp(`Hi! I'm interested in this product:
 
 Product: ${product.name}
 Collection: ${product.collection}
-Price: ₹${product.price.toLocaleString()}
+Price: ₹${Number(product.price).toLocaleString()}
 Size: ${selectedSize}
 Quantity: ${quantity}
-Image: http://localhost:5173${mainImage}
+Image: ${toImageUrl(mainImage)}
 
-Please share more details.`
-    );
+Please share more details.`);
   };
 
   return (
@@ -1501,7 +1588,8 @@ Please share more details.`
                 marginBottom: 18,
               }}
             >
-              <img src={getImageUrl(mainImage)} 
+              <img
+                src={toImageUrl(mainImage)}
                 alt={product.name}
                 style={{
                   width: "100%",
@@ -1519,22 +1607,20 @@ Please share more details.`
                 gap: 18,
               }}
             >
-              {(product.images || [product.image]).map((img, index) => (
+              {imageList.map((img, index) => (
                 <div
-                  key={index}
-                  onClick={() => setMainImage(img)}
+                  key={img.id || index}
+                  onClick={() => setMainImage(img.url)}
                   style={{
                     borderRadius: 12,
                     overflow: "hidden",
                     cursor: "pointer",
-                    border:
-                      mainImage === img
-                        ? `2px solid ${COLORS.deepRose}`
-                        : "1px solid #e6d8d5",
+                    border: mainImage === img.url ? `2px solid ${COLORS.deepRose}` : "1px solid #e6d8d5",
                     background: COLORS.white,
                   }}
                 >
-                  <img src={getImageUrl(img)}
+                  <img
+                    src={toImageUrl(img.url)}
                     alt={`${product.name} ${index + 1}`}
                     style={{
                       width: "100%",
@@ -1552,7 +1638,7 @@ Please share more details.`
             <div
               style={{
                 fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 18,
+                fontSize: 20,
                 color: COLORS.mutedText,
                 marginBottom: 10,
               }}
@@ -1563,11 +1649,9 @@ Please share more details.`
             <h1
               style={{
                 fontFamily: "'Playfair Display', serif",
-                fontSize: "clamp(38px, 4.5vw, 62px)",
-                fontWeight: 500,
+                fontSize: "clamp(42px,5vw,62px)",
                 color: COLORS.tobago,
-                marginBottom: 16,
-                lineHeight: 1.05,
+                margin: "0 0 16px",
               }}
             >
               {product.name}
@@ -1578,10 +1662,10 @@ Please share more details.`
                 fontFamily: "'Cormorant Garamond', serif",
                 fontSize: 34,
                 color: COLORS.tobago,
-                marginBottom: 10,
+                marginBottom: 18,
               }}
             >
-              Rs. {product.price.toLocaleString()}.00
+              Rs. {Number(product.price).toLocaleString()}.00
             </div>
 
             <div
@@ -1617,13 +1701,9 @@ Please share more details.`
                       height: 42,
                       padding: "0 18px",
                       borderRadius: 30,
-                      border: `1px solid ${
-                        selectedSize === size ? COLORS.tobago : "#b9aaa6"
-                      }`,
-                      background:
-                        selectedSize === size ? COLORS.tobago : "transparent",
-                      color:
-                        selectedSize === size ? COLORS.white : COLORS.tobago,
+                      border: `1px solid ${selectedSize === size ? COLORS.tobago : "#b9aaa6"}`,
+                      background: selectedSize === size ? COLORS.tobago : "transparent",
+                      color: selectedSize === size ? COLORS.white : COLORS.tobago,
                       cursor: "pointer",
                       fontFamily: "'Cormorant Garamond', serif",
                       fontSize: 18,
@@ -1717,19 +1797,7 @@ Please share more details.`
               Order on WhatsApp
             </button>
 
-            <div>
-              <div
-                style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: 20,
-                  letterSpacing: "0.06em",
-                  color: COLORS.tobago,
-                  marginBottom: 14,
-                }}
-              >
-                PRODUCT DESCRIPTION:
-              </div>
-
+            <div style={{ marginTop: 30 }}>
               <p
                 style={{
                   fontFamily: "'Cormorant Garamond', serif",
@@ -1813,82 +1881,77 @@ Please share more details.`
           </div>
         </div>
 
-        <div style={{ marginTop: 80 }}>
-          <h2
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              fontSize: 28,
-              color: COLORS.tobago,
-              marginBottom: 28,
-            }}
-          >
-            You may also like
-          </h2>
+        {related.length > 0 && (
+          <div style={{ marginTop: 80 }}>
+            <h2
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: 28,
+                color: COLORS.tobago,
+                marginBottom: 28,
+              }}
+            >
+              You may also like
+            </h2>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-              gap: 22,
-            }}
-          >
-            {relatedProducts.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => {
-                  onBack();
-                  setTimeout(() => {
-                    const event = new CustomEvent("openProduct", {
-                      detail: item,
-                    });
-                    window.dispatchEvent(event);
-                  }, 0);
-                }}
-                style={{ cursor: "pointer" }}
-              >
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                gap: 22,
+              }}
+            >
+              {related.map((item) => (
                 <div
-                  style={{
-                    borderRadius: 10,
-                    overflow: "hidden",
-                    marginBottom: 14,
-                    background: COLORS.white,
-                  }}
+                  key={item.id}
+                  onClick={() => onOpenProduct(item)}
+                  style={{ cursor: "pointer" }}
                 >
-                  <img src={getImageUrl(item.image)}
-                    alt={item.name}
+                  <div
                     style={{
-                      width: "100%",
-                      height: 300,
-                      objectFit: "cover",
-                      display: "block",
+                      borderRadius: 10,
+                      overflow: "hidden",
+                      marginBottom: 14,
+                      background: COLORS.white,
                     }}
-                  />
-                </div>
+                  >
+                    <img
+                      src={toImageUrl(item.image)}
+                      alt={item.name}
+                      style={{
+                        width: "100%",
+                        height: 300,
+                        objectFit: "cover",
+                        display: "block",
+                      }}
+                    />
+                  </div>
 
-                <div
-                  style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: 18,
-                    color: COLORS.tobago,
-                    marginBottom: 8,
-                  }}
-                >
-                  {item.name}
-                </div>
+                  <div
+                    style={{
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontSize: 18,
+                      color: COLORS.tobago,
+                      marginBottom: 8,
+                    }}
+                  >
+                    {item.name}
+                  </div>
 
-                <div
-                  style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: 16,
-                    color: COLORS.tobago,
-                  }}
-                >
-                  Rs. {item.price.toLocaleString()}.00
+                  <div
+                    style={{
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontSize: 16,
+                      color: COLORS.tobago,
+                    }}
+                  >
+                    Rs. {Number(item.price).toLocaleString()}.00
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );
@@ -1896,24 +1959,9 @@ Please share more details.`
 
 function Footer() {
   return (
-    <footer
-      style={{
-        background: COLORS.tobago,
-        color: COLORS.cream,
-        padding: "60px 0 30px",
-        position: "relative",
-        zIndex: 1,
-      }}
-    >
+    <footer style={{ background: COLORS.tobago, color: COLORS.cream, padding: "60px 0 30px", position: "relative", zIndex: 1 }}>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "2fr 1fr 1fr 1fr",
-            gap: 48,
-            marginBottom: 48,
-          }}
-        >
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 48, marginBottom: 48 }}>
           <div>
             <img
               src="/images/logo.jpeg"
@@ -1938,8 +1986,7 @@ function Footer() {
                 maxWidth: 260,
               }}
             >
-              Handcrafted women's fashion celebrating femininity, crafted to
-              order with love.
+              Handcrafted women&apos;s fashion celebrating femininity, crafted to order with love.
             </p>
           </div>
 
@@ -1998,6 +2045,7 @@ function Footer() {
           >
             © 2025 MOH by Amiksha. All rights reserved.
           </div>
+
           <a
             href={`https://wa.me/${WHATSAPP_NUMBER}`}
             target="_blank"
@@ -2024,209 +2072,29 @@ function Footer() {
   );
 }
 
-function CustomerLove() {
-  const [items, setItems] = useState([]);
-  const [selectedItem, setSelectedItem] = useState(null);
-
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/review-highlights")
-      .then((res) => res.json())
-      .then((data) => setItems(data))
-      .catch((err) => console.error("Customer Love error:", err));
-  }, []);
-
-  if (!items.length) return null;
-
-  return (
-    <section style={{ padding: "90px 0", position: "relative", zIndex: 1 }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <div
-            style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 13,
-              color: COLORS.rose,
-              letterSpacing: "0.2em",
-              marginBottom: 10,
-            }}
-          >
-            CUSTOMER LOVE
-          </div>
-
-          <h2
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              fontSize: "clamp(30px,4vw,48px)",
-              fontWeight: 700,
-              color: COLORS.tobago,
-              marginBottom: 14,
-            }}
-          >
-            Loved by Our Girls
-          </h2>
-
-          <p
-            style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 18,
-              color: COLORS.mutedText,
-              maxWidth: 620,
-              margin: "0 auto",
-              lineHeight: 1.8,
-            }}
-          >
-            A glimpse of beautiful moments shared by our customers.
-          </p>
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            gap: 22,
-            flexWrap: "wrap",
-            justifyContent: "center",
-          }}
-        >
-          {items.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => setSelectedItem(item)}
-              style={{
-                textAlign: "center",
-                cursor: "pointer",
-                width: 120,
-              }}
-            >
-              <div
-                style={{
-                  width: 96,
-                  height: 96,
-                  margin: "0 auto 10px",
-                  borderRadius: "50%",
-                  padding: 3,
-                  background:
-                    "linear-gradient(135deg, #DBA1A2 0%, #E8CFC3 100%)",
-                  boxShadow: "0 6px 18px rgba(219,161,162,0.22)",
-                }}
-              >
-                <img
-                  src={`http://127.0.0.1:8000${item.image_url}`}
-                  alt={item.title}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    borderRadius: "50%",
-                    display: "block",
-                    border: "3px solid white",
-                  }}
-                />
-              </div>
-
-              <div
-                style={{
-                  fontFamily: "'Playfair Display', serif",
-                  fontSize: 16,
-                  color: COLORS.tobago,
-                  marginBottom: 4,
-                }}
-              >
-                {item.title}
-              </div>
-
-              <div
-                style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: 14,
-                  color: COLORS.mutedText,
-                }}
-              >
-                {item.subtitle}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {selectedItem && (
-          <div
-            onClick={() => setSelectedItem(null)}
-            style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(0,0,0,0.65)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 999,
-              padding: 24,
-            }}
-          >
-            <div
-              onClick={(e) => e.stopPropagation()}
-              style={{
-                background: "#fff",
-                padding: 18,
-                borderRadius: 20,
-                maxWidth: 520,
-                width: "100%",
-              }}
-            >
-              <img
-                src={`http://127.0.0.1:8000${selectedItem.image_url}`}
-                alt={selectedItem.title}
-                style={{
-                  width: "100%",
-                  borderRadius: 16,
-                  display: "block",
-                }}
-              />
-              <div
-                style={{
-                  marginTop: 14,
-                  fontFamily: "'Playfair Display', serif",
-                  fontSize: 22,
-                  color: COLORS.tobago,
-                }}
-              >
-                {selectedItem.title}
-              </div>
-              <div
-                style={{
-                  marginTop: 6,
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: 17,
-                  color: COLORS.mutedText,
-                }}
-              >
-                {selectedItem.subtitle}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
-
 export default function UserSite() {
   const [activeSection, setActiveSection] = useState("home");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [products, setProducts] = useState(fallbackProducts);
+  const [products, setProducts] = useState([]);
   const sectionRef = useRef(null);
 
-useEffect(() => {
-  fetch("http://127.0.0.1:8000/products")
-    .then((res) => res.json())
-    .then((data) => {
-      if (Array.isArray(data) && data.length > 0) {
-        setProducts(data);
-      }
-    })
-    .catch((err) => {
-      console.error("Failed to fetch products:", err);
-    });
-}, []);
+  useEffect(() => {
+    fetch(`${API_BASE}/products`)
+      .then((res) => res.json())
+      .then((data) => setProducts(Array.isArray(data) ? data : []))
+      .catch((err) => console.error("Products fetch error:", err));
+  }, []);
+
+  useEffect(() => {
+    const handler = (e) => {
+      setSelectedProduct(e.detail);
+      setActiveSection("shop");
+    };
+
+    window.addEventListener("openProduct", handler);
+    return () => window.removeEventListener("openProduct", handler);
+  }, []);
 
   useEffect(() => {
     if (activeSection !== "home" && sectionRef.current) {
@@ -2235,14 +2103,7 @@ useEffect(() => {
   }, [activeSection]);
 
   return (
-    <div
-      style={{
-        background: COLORS.cream,
-        minHeight: "100vh",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
+    <div style={{ background: COLORS.cream, minHeight: "100vh", position: "relative", overflow: "hidden" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -2261,77 +2122,84 @@ useEffect(() => {
       <FloralBg />
       <Nav
         activeSection={activeSection}
-        setActiveSection={setActiveSection}
+        setActiveSection={(section) => {
+          setActiveSection(section);
+          if (section !== "shop") setSelectedProduct(null);
+        }}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
       />
 
       <div ref={sectionRef}>
-{activeSection === "home" && (
-  <>
-    <HeroSection
-      setActiveSection={setActiveSection}
-      products={products}
-    />
+        {activeSection === "home" && (
+          <>
+            <HeroSection setActiveSection={setActiveSection} products={products} />
+            <AboutSection />
 
-    {/* ✨ Soft glowing divider */}
-<div
-  style={{
-    position: "relative",
-    width: "70%",
-    height: 2,
-    borderRadius: 999,
-    background:
-      "linear-gradient(90deg, rgba(255,255,255,0) 0%, #E8CFC3 25%, #DBA1A2 50%, #E8CFC3 75%, rgba(255,255,255,0) 100%)",
-    boxShadow:
-      "0 0 20px rgba(219,161,162,0.4), 0 0 30px rgba(232,207,195,0.3)",
-  }}
->
-  {/* Left icon */}
-  <span
-    style={{
-      position: "absolute",
-      left: -12,
-      top: "50%",
-      transform: "translateY(-50%)",
-      color: "#DBA1A2",
-      fontSize: 14,
-      opacity: 0.9,
-    }}
-  >
-    ✧
-  </span>
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                margin: "50px 0 30px",
+              }}
+            >
+              <div
+                style={{
+                  position: "relative",
+                  width: "70%",
+                  height: 2,
+                  borderRadius: 999,
+                  background:
+                    "linear-gradient(270deg, rgba(255,255,255,0) 0%, #E8CFC3 25%, #DBA1A2 50%, #E8CFC3 75%, rgba(255,255,255,0) 100%)",
+                  boxShadow:
+                    "0 0 20px rgba(219,161,162,0.35), 0 0 30px rgba(232,207,195,0.25)",
+                }}
+              >
+                <span
+                  style={{
+                    position: "absolute",
+                    left: -14,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: "#CFA7A7",
+                    fontSize: 14,
+                    opacity: 0.9,
+                  }}
+                >
+                  ❤
+                </span>
+                <span
+                  style={{
+                    position: "absolute",
+                    right: -14,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: "#CFA7A7",
+                    fontSize: 14,
+                    opacity: 0.9,
+                  }}
+                >
+                  ✧
+                </span>
+              </div>
+            </div>
 
-  {/* Right icon */}
-  <span
-    style={{
-      position: "absolute",
-      right: -12,
-      top: "50%",
-      transform: "translateY(-50%)",
-      color: "#DBA1A2",
-      fontSize: 14,
-      opacity: 0.9,
-    }}
-  >
-    ✧   ✦   ✩   ♥
-  </span>
-</div>
+            <CustomerLove />
+          </>
+        )}
 
-    <AboutSection />
-    <CustomerLove />
-  </>
-)}
-{activeSection === "shop" && !selectedProduct && (
-  <ShopSection products={products} onViewProduct={setSelectedProduct} />
-)}
-{selectedProduct && (
-  <ProductDetailView
-    product={selectedProduct}
-    products={products}
-    onBack={() => setSelectedProduct(null)}
-  />
-)}
+        {activeSection === "shop" &&
+          (!selectedProduct ? (
+            <ShopSection products={products} onViewProduct={setSelectedProduct} />
+          ) : (
+            <ProductDetailView
+              product={selectedProduct}
+              onBack={() => setSelectedProduct(null)}
+              onOpenProduct={(item) => setSelectedProduct(item)}
+            />
+          ))}
+
         {activeSection === "collections" && <CollectionsSection products={products} />}
         {activeSection === "customize" && <CustomizeSection products={products} />}
         {activeSection === "about" && <AboutSection />}
@@ -2364,9 +2232,7 @@ useEffect(() => {
         onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
         title="Chat on WhatsApp"
       >
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-        </svg>
+        WA
       </a>
     </div>
   );

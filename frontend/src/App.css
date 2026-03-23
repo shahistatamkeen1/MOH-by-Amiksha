@@ -182,3 +182,34 @@
     border-right-color: var(--border);
   }
 }
+
+.section-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 60px 0 40px;
+  gap: 10px;
+}
+
+.section-divider .line {
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    rgba(214, 189, 159, 0.2),
+    #d6bd9f,
+    #e6b7b2,
+    rgba(230, 183, 178, 0.2)
+  );
+  box-shadow: 0 0 8px rgba(230, 183, 178, 0.4);
+}
+
+.section-divider .icon {
+  font-size: 14px;
+  color: #c8a7a0;
+  opacity: 0.8;
+}
+
+.section-divider.reverse {
+  flex-direction: row-reverse;
+}
