@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 const API_BASE = "http://127.0.0.1:8000";
-const WHATSAPP_NUMBER = "919912021000";
+const WHATSAPP_NUMBER = "919505888821";
 
 const COLORS = {
   cream: "#F9F6F1",
@@ -1957,11 +1957,74 @@ Please share more details.`);
   );
 }
 
-function Footer() {
+function Footer({ setActiveSection }) {
+  const footerSections = [
+    {
+      heading: "Shop",
+      items: [
+        { label: "All Pieces", type: "button", section: "shop" },
+        { label: "New Arrivals", type: "button", section: "shop" },
+        { label: "Collections", type: "button", section: "collections" },
+        { label: "Customize", type: "button", section: "customize" },
+      ],
+    },
+    {
+      heading: "Info",
+      items: [
+        { label: "About Us", type: "button", section: "about" },
+        { label: "Instagram", type: "link", href: "https://www.instagram.com/moh_by_amiksha/" },
+        { label: "WhatsApp Us", type: "link", href: `https://wa.me/${WHATSAPP_NUMBER}` },
+        { label: "Care Guide", type: "button", section: "about" },
+      ],
+    },
+    {
+      heading: "Policy",
+      items: [
+        { label: "Shipping", type: "button", section: "about" },
+        { label: "Returns", type: "button", section: "about" },
+        { label: "Privacy", type: "button", section: "about" },
+        { label: "Terms", type: "button", section: "about" },
+      ],
+    },
+  ];
+
+  const itemStyle = {
+    display: "block",
+    width: "100%",
+    background: "transparent",
+    border: "none",
+    padding: 0,
+    marginBottom: 12,
+    textAlign: "left",
+    cursor: "pointer",
+    color: COLORS.cream,
+    opacity: 0.78,
+    textDecoration: "none",
+    fontFamily: "'Cormorant Garamond',serif",
+    fontSize: 15,
+    lineHeight: 1.3,
+  };
+
   return (
-    <footer style={{ background: COLORS.tobago, color: COLORS.cream, padding: "60px 0 30px", position: "relative", zIndex: 1 }}>
+    <footer
+      style={{
+        background: COLORS.tobago,
+        color: COLORS.cream,
+        padding: "60px 0 30px",
+        position: "relative",
+        zIndex: 1,
+      }}
+    >
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 48, marginBottom: 48 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1.5fr 1fr 1fr 1fr",
+            gap: 48,
+            marginBottom: 48,
+            alignItems: "start",
+          }}
+        >
           <div>
             <img
               src="/images/logo.jpeg"
@@ -1981,7 +2044,7 @@ function Footer() {
               style={{
                 fontFamily: "'Cormorant Garamond',serif",
                 fontSize: 16,
-                opacity: 0.7,
+                opacity: 0.78,
                 lineHeight: 1.8,
                 maxWidth: 260,
               }}
@@ -1990,37 +2053,45 @@ function Footer() {
             </p>
           </div>
 
-          {[
-            ["Shop", ["All Pieces", "New Arrivals", "Collections", "Customize"]],
-            ["Info", ["About Us", "Instagram", "WhatsApp Us", "Care Guide"]],
-            ["Policy", ["Shipping", "Returns", "Privacy", "Terms"]],
-          ].map(([h, items]) => (
-            <div key={h}>
+          {footerSections.map((section) => (
+            <div key={section.heading}>
               <h4
                 style={{
                   fontFamily: "'Playfair Display',serif",
                   fontSize: 14,
                   letterSpacing: "0.15em",
-                  opacity: 0.6,
-                  marginBottom: 20,
+                  opacity: 0.65,
+                  marginBottom: 18,
                 }}
               >
-                {h.toUpperCase()}
+                {section.heading.toUpperCase()}
               </h4>
-              {items.map((i) => (
-                <div
-                  key={i}
-                  style={{
-                    fontFamily: "'Cormorant Garamond',serif",
-                    fontSize: 15,
-                    opacity: 0.7,
-                    marginBottom: 10,
-                    cursor: "pointer",
-                  }}
-                >
-                  {i}
-                </div>
-              ))}
+
+              {section.items.map((item) =>
+                item.type === "link" ? (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={itemStyle}
+                  >
+                    {item.label}
+                  </a>
+                ) : (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => {
+                      setActiveSection(item.section);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    style={itemStyle}
+                  >
+                    {item.label}
+                  </button>
+                )
+              )}
             </div>
           ))}
         </div>
@@ -2040,7 +2111,7 @@ function Footer() {
             style={{
               fontFamily: "'Cormorant Garamond',serif",
               fontSize: 14,
-              opacity: 0.5,
+              opacity: 0.55,
             }}
           >
             © 2025 MOH by Amiksha. All rights reserved.
@@ -2132,62 +2203,118 @@ export default function UserSite() {
 
       <div ref={sectionRef}>
         {activeSection === "home" && (
-          <>
-            <HeroSection setActiveSection={setActiveSection} products={products} />
-            <AboutSection />
+  <>
+    <HeroSection setActiveSection={setActiveSection} products={products} />
+{/* ✨ PREMIUM DIVIDER WITH ICONS */}
+<div
+  style={{
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    margin: "30px 0 60px",
+  }}
+>
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      width: "70%",
+    }}
+  >
+    {/* LEFT ICON */}
+    <span
+      style={{
+        color: "#d8a5a0",
+        fontSize: 14,
+        opacity: 0.9,
+      }}
+    >
+      ✦ ✧
+    </span>
 
-            <div
-              style={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "center",
-                margin: "50px 0 30px",
-              }}
-            >
-              <div
-                style={{
-                  position: "relative",
-                  width: "70%",
-                  height: 2,
-                  borderRadius: 999,
-                  background:
-                    "linear-gradient(270deg, rgba(255,255,255,0) 0%, #E8CFC3 25%, #DBA1A2 50%, #E8CFC3 75%, rgba(255,255,255,0) 100%)",
-                  boxShadow:
-                    "0 0 20px rgba(219,161,162,0.35), 0 0 30px rgba(232,207,195,0.25)",
-                }}
-              >
-                <span
-                  style={{
-                    position: "absolute",
-                    left: -14,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    color: "#CFA7A7",
-                    fontSize: 14,
-                    opacity: 0.9,
-                  }}
-                >
-                  ❤
-                </span>
-                <span
-                  style={{
-                    position: "absolute",
-                    right: -14,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    color: "#CFA7A7",
-                    fontSize: 14,
-                    opacity: 0.9,
-                  }}
-                >
-                  ✧
-                </span>
-              </div>
-            </div>
+    {/* LINE */}
+    <div
+      style={{
+        flex: 1,
+        height: 1.5,
+        background:
+          "linear-gradient(90deg, transparent, #e6cfc9, #d8a5a0, #e6cfc9, transparent)",
+        borderRadius: 999,
+      }}
+    />
 
-            <CustomerLove />
-          </>
-        )}
+    {/* RIGHT ICON */}
+    <span
+      style={{
+        color: "#d8a5a0",
+        fontSize: 14,
+        opacity: 0.9,
+      }}
+    >
+      ❤ ❤
+    </span>
+  </div>
+</div>
+    <AboutSection />
+
+    <div
+      style={{
+        width: "100%",
+        display: "flex",
+        justifyContent: "center",
+        margin: "40px 0 50px",
+        position: "relative",
+        zIndex: 2,
+      }}
+    >
+      <div
+        style={{
+          position: "relative",
+          width: "72%",
+          height: 2,
+          borderRadius: 999,
+          background:
+            "linear-gradient(270deg, rgba(255,255,255,0) 0%, #E8CFC3 25%, #DBA1A2 50%, #E8CFC3 75%, rgba(255,255,255,0) 100%)",
+          boxShadow:
+            "0 0 20px rgba(219,161,162,0.35), 0 0 30px rgba(232,207,195,0.25)",
+        }}
+      >
+        <span
+          style={{
+            position: "absolute",
+            left: -18,
+            top: "50%",
+            transform: "translateY(-50%)",
+            color: "#CFA7A7",
+            fontSize: 14,
+            opacity: 0.9,
+            letterSpacing: "0.2em",
+          }}
+        >
+          ❤ ❤
+        </span>
+
+        <span
+          style={{
+            position: "absolute",
+            right: -18,
+            top: "50%",
+            transform: "translateY(-50%)",
+            color: "#CFA7A7",
+            fontSize: 14,
+            opacity: 0.9,
+            letterSpacing: "0.2em",
+          }}
+        >
+          ✧ ✦
+        </span>
+      </div>
+    </div>
+
+    <CustomerLove />
+  </>
+)}
 
         {activeSection === "shop" &&
           (!selectedProduct ? (
@@ -2205,7 +2332,7 @@ export default function UserSite() {
         {activeSection === "about" && <AboutSection />}
       </div>
 
-      <Footer />
+      <Footer setActiveSection={setActiveSection} />
 
       <a
         href={`https://wa.me/${WHATSAPP_NUMBER}`}
